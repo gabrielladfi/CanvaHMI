@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple Rotating Glowing Ellipses</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="glowCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('glowCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Ajustamos el tamaño del canvas al tamaño de la ventana
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Parámetros de las elipses (puedes agregar tantas como quieras)
+        const ellipses = [
+            {
+                x: canvas.width / 2,        // Centro de la elipse
+                y: canvas.height / 2,       // Centro de la elipse
+                axisX: 120,                 // Eje menor
+                axisY: 120 * 1.2,           // Eje mayor
+                borderWidth: 4,             // Grosor del borde
+                rotationSpeed: 0.02,        // Velocidad de rotación
+                angle: 0,                   // Ángulo inicial
+                glowColor: '#d9dafe',       // Color del resplandor
+                opacity: "71, 255, 255, 0.5",              // Opacidad del borde
+                manecillas: true,           // Dirección de rotación (true: sentido horario)
+                sizechange: true,           // Cambia de tamaño si es true
+                scale: 1,                   // Escala inicial
+                scaleSpeed: 0.005           // Velocidad del cambio de tamaño
+            },
+            {
+                x: canvas.width / 2,       // Otra elipse en otra posición
+                y: canvas.height / 2,       
+                axisX: 150,                 
+                axisY: 150 * 1.1,           
+                borderWidth: 4,             
+                rotationSpeed: 0.06,        
+                angle: 0,                   
+                glowColor: '#1273fe',       // Resplandor rojo claro
+                opacity:"71, 255, 255, 0.5",            // Opacidad del borde
+                manecillas: false,            // Girar hacía las manecillas         
+                sizechange: false,         
+                scale: 1,
+                scaleSpeed: 0              
+            },
+            {
+                x: (canvas.width * 3) / 4,  
+                y: canvas.height / 3,       
+                axisX: 80,                  
+                axisY: 80 * 1.2,            
+                borderWidth: 5,             
+                rotationSpeed: 0.015,       
+                angle: 0,                   
+                glowColor: '#b3ffb3',       
+                opacity: "71, 255, 255, 0.5",              
+                manecillas: true,           
+                sizechange: true,           
+                scale: 1,                   
+                scaleSpeed: 0.003           
+            }
+        ];
+
+        // Función de dibujo de una elipse
+        function drawEllipse(ellipse) {
+            ctx.save();
+
+            // Trasladamos el contexto al centro de la elipse
+            ctx.translate(ellipse.x, ellipse.y);
+
+            // Aplicamos la rotación
+            ctx.rotate(ellipse.angle);
+
+            // Aplicamos el cambio de tamaño si 'sizechange' es true
+            if (ellipse.sizechange) {
+                ellipse.scale += ellipse.scaleSpeed;
+
+                // Hacemos oscilar la escala entre 1 y 0.75
+                if (ellipse.scale > 1 || ellipse.scale < 0.75) {
+                    ellipse.scaleSpeed *= -1; // Invertimos la dirección del cambio de tamaño
+                }
+            }
+
+            // Dibujamos la elipse con la escala aplicada
+            ctx.beginPath();
+            ctx.ellipse(0, 0, ellipse.axisX * ellipse.scale, ellipse.axisY * ellipse.scale, 0, 0, 2 * Math.PI);
+
+            // Aplicamos estilos para el borde fosforescente
+            ctx.lineWidth = ellipse.borderWidth;
+            ctx.strokeStyle = `rgba(${ellipse.opacity})`; // Borde blanco con opacidad variable
+            ctx.shadowBlur = 40; // Mayor blur para el resplandor
+            ctx.shadowColor = ellipse.glowColor; // Color del resplandor
+
+            ctx.stroke();
+            ctx.restore();
+
+            // Incrementamos o decrementamos el ángulo para la rotación según la dirección
+            if (ellipse.manecillas) {
+                ellipse.angle += ellipse.rotationSpeed; // Sentido horario
+            } else {
+                ellipse.angle -= ellipse.rotationSpeed; // Sentido antihorario
+            }
+        }
+
+        // Función para dibujar todas las elipses
+        function drawAllEllipses() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Dibujamos cada elipse del array
+            ellipses.forEach(drawEllipse);
+
+            // Llamamos a la siguiente animación en cada frame
+            requestAnimationFrame(drawAllEllipses);
+        }
+
+        // Iniciamos la animación
+        drawAllEllipses();
+
+        // Actualizamos el tamaño del canvas si se redimensiona la ventana
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Ajustamos la posición de las elipses si es necesario
+            ellipses.forEach((ellipse, index) => {
+                if (index === 0) {
+                    ellipse.x = canvas.width / 2;
+                    ellipse.y = canvas.height / 2;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple Rotating Glowing Ellipses</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="glowCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('glowCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Ajustamos el tamaño del canvas al tamaño de la ventana
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Parámetros de las elipses (puedes agregar tantas como quieras)
+        const ellipses = [
+            {
+                x: canvas.width / 2,        // Centro de la elipse
+                y: canvas.height / 2,       // Centro de la elipse
+                axisX: 150,                 // Eje menor
+                axisY: 150 * 1.1,           // Eje mayor
+                borderWidth: 3,             // Grosor del borde
+                rotationSpeed: 0.01,        // Velocidad de rotación
+                angle: 0,                   // Ángulo inicial
+                glowColor: '#1273fe',       // Color del resplandor
+                opacity:"71, 255, 255, 0.5",  // Opacidad del borde
+                manecillas: true,            // Girar hacía las manecillas
+                sizechange: true,          
+                scale: 0.15,                   
+                scaleSpeed: 0.005           
+            },
+            {
+                x: canvas.width / 2,       // Otra elipse en otra posición
+                y: canvas.height / 2,       
+                axisX: 150,                 
+                axisY: 150 * 1.1,           
+                borderWidth: 4,             
+                rotationSpeed: 0.06,        
+                angle: 0,                   
+                glowColor: '#1273fe',       // Resplandor rojo claro
+                opacity:"71, 255, 255, 0.5",            // Opacidad del borde
+                manecillas: false,            // Girar hacía las manecillas
+                sizechange: true,          
+                scale: 0.75,                   
+                scaleSpeed: 0.005                 
+            },
+            {
+                x: canvas.width / 2, 
+                y: canvas.height / 2,       
+                axisX: 150,                  
+                axisY: 150 * 1.05,            
+                borderWidth: 5,             
+                rotationSpeed: 0.015,       
+                angle: 0,                   
+                glowColor: '#1273fe',       
+                opacity:"71, 255, 255, 0.5",           
+                manecillas: true,
+                sizechange: true,          
+                scale: 1,                   
+                scaleSpeed: 0.005                        
+            },
+            {
+                x: canvas.width / 2, 
+                y: canvas.height / 2,       
+                axisX: 152,                  
+                axisY: 152 * 1.05,            
+                borderWidth: 3,             
+                rotationSpeed: 0.015,       
+                angle: 0,                   
+                glowColor: '#1273fe',       
+                opacity:"71, 255, 255, 0.5",             
+                manecillas: false,
+                sizechange: true,          
+                scale: 1,                   
+                scaleSpeed: 0.005                      
+            },
+            {
+                x: canvas.width / 2, 
+                y: canvas.height / 2,       
+                axisX: 150,                  
+                axisY: 150,            
+                borderWidth: 4,             
+                rotationSpeed: 0.015,       
+                angle: 0,                   
+                glowColor: '#1273fe',       
+                opacity:"71, 255, 255, 0.5",             
+                manecillas: true,
+                sizechange: true,          
+                scale: 1,                   
+                scaleSpeed: 0.005                      
+            },
+            {
+                x: canvas.width / 2, 
+                y: canvas.height / 2,       
+                axisX: 160,                  
+                axisY: 160,            
+                borderWidth: 3,             
+                rotationSpeed: 0.015,       
+                angle: 0,                   
+                glowColor: '#1273fe',       
+                opacity:"200, 255, 255, 0.5",             
+                manecillas: true,
+                sizechange: true,          
+                scale: 1,                   
+                scaleSpeed: 0.005                      
+            },
+            {
+                x: canvas.width / 2, 
+                y: canvas.height / 2,       
+                axisX: 160,                  
+                axisY: 160*1.05,            
+                borderWidth: 5,             
+                rotationSpeed: 0.025,       
+                angle: 0,                   
+                glowColor: '#1273fe',       
+                opacity:"240, 255, 255, 0.8",             
+                manecillas: false,
+                sizechange: true,          
+                scale: 1,                   
+                scaleSpeed: 0.005                      
+            },
+            {
+                x: canvas.width / 2, 
+                y: canvas.height / 2,       
+                axisX: 160,                  
+                axisY: 160*1.02,            
+                borderWidth: 5,             
+                rotationSpeed: 0.01,       
+                angle: 30,                   
+                glowColor: '#1273fe',       
+                opacity:"200, 255, 255, 0.5",             
+                manecillas: true,
+                sizechange: true,          
+                scale: 1,                   
+                scaleSpeed: 0.005                      
+            },
+            {
+                x: canvas.width / 2, 
+                y: canvas.height / 2,       
+                axisX: 180,                  
+                axisY: 180*1.1,            
+                borderWidth: 5,             
+                rotationSpeed: 0.02,       
+                angle: 0,                   
+                glowColor: '#1273fe',       
+                opacity:"0, 88, 255, 0.75",             
+                manecillas: false,
+                sizechange: true,          
+                scale: 1,                   
+                scaleSpeed: 0.005                      
+            },
+            {
+                x: canvas.width / 2, 
+                y: canvas.height / 2,       
+                axisX: 180,                  
+                axisY: 180*1.09,            
+                borderWidth: 5,             
+                rotationSpeed: 0.015,       
+                angle: 30,                   
+                glowColor: '#1273fe',       
+                opacity:"0, 88, 255, 0.75",             
+                manecillas: true,
+                sizechange: true,          
+                scale: 1,                   
+                scaleSpeed: 0.005                      
+            },
+            {
+                x: canvas.width / 2, 
+                y: canvas.height / 2,       
+                axisX: 180,                  
+                axisY: 180*1.05,            
+                borderWidth: 5,             
+                rotationSpeed: 0.015,       
+                angle: 60,                   
+                glowColor: '#1273fe',       
+                opacity:"0, 88, 255, 0.75",             
+                manecillas: true,
+                sizechange: true,          
+                scale: 1,                   
+                scaleSpeed: 0.005                      
+            },
+            {
+                x: canvas.width / 2, 
+                y: canvas.height / 2,       
+                axisX: 180,                  
+                axisY: 180*1.07,            
+                borderWidth: 5,             
+                rotationSpeed: 0.015,       
+                angle: 90,                   
+                glowColor: '#1273fe',       
+                opacity:"0, 88, 255, 0.75",             
+                manecillas: false,
+                sizechange: true,          
+                scale: 1,                   
+                scaleSpeed: 0.005                      
+            },
+            {
+                x: canvas.width / 2, 
+                y: canvas.height / 2,       
+                axisX: 170,                  
+                axisY: 170*1.02,            
+                borderWidth: 5,             
+                rotationSpeed: 0.005,       
+                angle: 120,                   
+                glowColor: '#1273fe',       
+                opacity:"0, 88, 255, 0.75",             
+                manecillas: false,
+                sizechange: true,          
+                scale: 1,                   
+                scaleSpeed: 0.005                      
+            },
+            {
+                x: canvas.width / 2, 
+                y: canvas.height / 2,       
+                axisX: 172,                  
+                axisY: 172*1.02,            
+                borderWidth: 5,             
+                rotationSpeed: 0.025,       
+                angle: 150,                   
+                glowColor: '#1273fe',       
+                opacity:"0, 88, 255, 0.75",             
+                manecillas: true,
+                sizechange: true,          
+                scale: 1,                   
+                scaleSpeed: 0.005                      
+            },
+            {
+                x: canvas.width / 2, 
+                y: canvas.height / 2,       
+                axisX: 200,                  
+                axisY: 200*1.15,            
+                borderWidth: 8,             
+                rotationSpeed: 0.015,       
+                angle: 150,                   
+                glowColor: '#1273fe',       
+                opacity:"20, 15, 120, 0.5",             
+                manecillas: true,
+                sizechange: true,          
+                scale: 1,                   
+                scaleSpeed: 0.005                      
+            },
+            {
+                x: canvas.width / 2, 
+                y: canvas.height / 2,       
+                axisX: 220,                  
+                axisY: 225,            
+                borderWidth: 8,             
+                rotationSpeed: 0.015,       
+                angle: 30,                   
+                glowColor: '#1273fe',       
+                opacity:"20, 15, 120, 0.5",             
+                manecillas: false,
+                sizechange: true,          
+                scale: 1,                   
+                scaleSpeed: 0.005                      
+            },
+            {
+                x: canvas.width / 2, 
+                y: canvas.height / 2,       
+                axisX: 220,                  
+                axisY: 230,            
+                borderWidth: 8,             
+                rotationSpeed: 0.02,       
+                angle: 60,                   
+                glowColor: '#1273fe',       
+                opacity:"20, 15, 120, 0.5",             
+                manecillas: false,
+                sizechange: true,          
+                scale: 1,                   
+                scaleSpeed: 0.005                      
+            },
+            {
+                x: canvas.width / 2, 
+                y: canvas.height / 2,       
+                axisX: 195,                  
+                axisY: 200,            
+                borderWidth: 4,             
+                rotationSpeed: 0.02,       
+                angle: 120,                   
+                glowColor: '#1273fe',       
+                opacity:"20, 15, 120, 0.5",             
+                manecillas: true,
+                sizechange: true,          
+                scale: 1,                   
+                scaleSpeed: 0.005                      
+            },
+            {
+                x: canvas.width / 2, 
+                y: canvas.height / 2,       
+                axisX: 195,                  
+                axisY: 198,            
+                borderWidth: 6,             
+                rotationSpeed: 0.01,       
+                angle: 0,                   
+                glowColor: '#1273fe',       
+                opacity:"20, 15, 120, 0.5",             
+                manecillas: true,
+                sizechange: true,          
+                scale: 1,                   
+                scaleSpeed: 0.005                      
+            }
+        ];
+
+        // Función de dibujo de una elipse
+        function drawEllipse(ellipse) {
+            ctx.save();
+
+            // Trasladamos el contexto al centro de la elipse
+            ctx.translate(ellipse.x, ellipse.y);
+
+            // Aplicamos la rotación
+            ctx.rotate(ellipse.angle);
+
+            // Dibujamos la elipse
+            ctx.beginPath();
+            ctx.ellipse(0, 0, ellipse.axisX, ellipse.axisY, 0, 0, 2 * Math.PI);
+
+            // Aplicamos estilos para el borde fosforescente
+            ctx.lineWidth = ellipse.borderWidth;
+            ctx.strokeStyle = `rgba(${ellipse.opacity})`; 
+            ctx.shadowBlur = 120; // Mayor blur para el resplandor
+            ctx.shadowColor = ellipse.glowColor; // Color del resplandor
+
+            ctx.stroke();
+            ctx.restore();
+
+         
+
+            // Incrementamos o decrementamos el ángulo para la rotación según la dirección
+            if (ellipse.manecillas) {
+                ellipse.angle += ellipse.rotationSpeed; // Sentido horario
+            } else {
+                ellipse.angle -= ellipse.rotationSpeed; // Sentido antihorario
+            }
+
+             // Aplicamos el cambio de tamaño si 'sizechange' es true
+             if (ellipse.sizechange) {
+                ellipse.scale += ellipse.scaleSpeed;
+
+                // Hacemos oscilar la escala entre 1 y 0.75
+                if (ellipse.scale > 1 || ellipse.scale < 0.75) {
+                    ellipse.scaleSpeed *= -1; // Invertimos la dirección del cambio de tamaño
+                }
+            }
+
+        }
+
+        // Función para dibujar todas las elipses
+        function drawAllEllipses() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Dibujamos cada elipse del array
+            ellipses.forEach(drawEllipse);
+
+            // Llamamos a la siguiente animación en cada frame
+            requestAnimationFrame(drawAllEllipses);
+        }
+
+        // Iniciamos la animación
+        drawAllEllipses();
+
+        // Actualizamos el tamaño del canvas si se redimensiona la ventana
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Ajustamos la posición de las elipses si es necesario
+            ellipses.forEach((ellipse, index) => {
+                if (index === 0) {
+                    ellipse.x = canvas.width / 2;
+                    ellipse.y = canvas.height / 2;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
